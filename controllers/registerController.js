@@ -20,13 +20,16 @@ const handleNewUser = async (req, res) => {
     profile_picture,
   } = req.body;
 
-  // check for duplicate usernames in the db
   const duplicate = await User.findOne({
     phone_code: phone_code,
     phone: phone,
     verified: true,
   }).exec();
-  if (duplicate) return res.sendStatus(409); //Conflict
+  if (duplicate)
+    return res.status(409).json({
+      status: 409,
+      message: "Telefon numarası kullanımda.",
+    });
 
   try {
     let otp = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
