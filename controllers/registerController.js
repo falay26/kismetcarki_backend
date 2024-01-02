@@ -26,7 +26,7 @@ const handleNewUser = async (req, res) => {
     verified: true,
   }).exec();
   if (duplicate)
-    return res.status(409).json({
+    return res.status(200).json({
       status: 409,
       message: "Telefon numarası kullanımda.",
     });
