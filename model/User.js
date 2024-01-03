@@ -38,6 +38,9 @@ const userSchema = new Schema(
     register_otp: {
       type: String,
     },
+    login_otp: {
+      type: String,
+    },
     verified: {
       type: Boolean,
       default: false,

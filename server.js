@@ -39,9 +39,11 @@ app.use("/", require("./routes/root"));
 app.use("/register", require("./routes/auth/register"));
 app.use("/confirm_register_otp", require("./routes/auth/confirm_register_otp"));
 app.use("/resend_register_otp", require("./routes/auth/resend_register_otp"));
+app.use("/login", require("./routes/auth/auth"));
+app.use("/confirm_login_otp", require("./routes/auth/confirm_login_otp"));
+app.use("/resend_login_otp", require("./routes/auth/resend_login_otp"));
 
 /*
-app.use("/auth", require("./routes/auth"));
 app.use("/refresh", require("./routes/refresh"));
 app.use("/logout", require("./routes/logout"));
 

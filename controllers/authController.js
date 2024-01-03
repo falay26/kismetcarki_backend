@@ -1,84 +1,173 @@
 const User = require("../model/User");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+//Twillio
+var accountSid = process.env.TWILIO_ACCOUNT_SID;
+var authToken = process.env.TWILIO_AUTH_TOKEN;
+
+const client = require("twilio")(accountSid, authToken, {
+  lazyLoading: true,
+});
+//Twillio
 
 const handleLogin = async (req, res) => {
-  const cookies = req.cookies;
+  const { phone_code, phone } = req.body;
 
-  const { user, pwd } = req.body;
-  if (!user || !pwd)
-    return res
-      .status(400)
-      .json({ message: "Username and password are required." });
-
-  const foundUser = await User.findOne({ username: user }).exec();
-  if (!foundUser) return res.sendStatus(401); //Unauthorized
-  // evaluate password
-  const match = await bcrypt.compare(pwd, foundUser.password);
-  if (match) {
-    const roles = Object.values(foundUser.roles).filter(Boolean);
-    // create JWTs
-    const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          username: foundUser.username,
-          roles: roles,
-        },
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1h" }
-    );
-    const newRefreshToken = jwt.sign(
-      { username: foundUser.username },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    // Changed to let keyword
-    let newRefreshTokenArray = !cookies?.jwt
-      ? foundUser.refreshToken
-      : foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
-
-    if (cookies?.jwt) {
-      /* 
-            Scenario added here: 
-                1) User logs in but never uses RT and does not logout 
-                2) RT is stolen
-                3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
-            */
-      const refreshToken = cookies.jwt;
-      const foundToken = await User.findOne({ refreshToken }).exec();
-
-      // Detected refresh token reuse!
-      if (!foundToken) {
-        // clear out ALL previous refresh tokens
-        newRefreshTokenArray = [];
-      }
-
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
+  try {
+    const foundUser = await User.findOne({
+      phone_code: phone_code,
+      phone: phone,
+      verified: true,
+    }).exec();
+    if (!foundUser)
+      return res.status(200).json({
+        status: 409,
+        message: "Kullanıcı bulunamadı.",
       });
-    }
 
-    // Saving refreshToken with current user
-    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-    const result = await foundUser.save();
+    let otp = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
+    client.messages
+      .create({
+        body: "Onay kodunuz: " + otp,
+        from: "+12542384391",
+        to: phone_code + phone,
+      })
+      .then(() => {})
+      .catch(() => {});
 
-    // Creates Secure Cookie with refresh token
-    res.cookie("jwt", newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+    foundUser.login_otp = otp;
+    await foundUser.save();
+
+    res.status(200).json({
+      status: 200,
+      message: `Otp gönderildi!`,
     });
-
-    // Send authorization roles and access token to user
-    res.json({ roles, accessToken });
-  } else {
-    res.sendStatus(401);
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
   }
 };
 
-module.exports = { handleLogin };
+const confirmLoginOtp = async (req, res) => {
+  const { phone_code, phone, otp } = req.body;
+
+  try {
+    const cookies = req.cookies;
+
+    const foundUser = await User.findOne({
+      phone_code: phone_code,
+      phone: phone,
+      verified: true,
+    }).exec();
+    if (!foundUser)
+      return res.status(200).json({
+        status: 409,
+        message: "Kullanıcı bulunamadı.",
+      });
+
+    if (foundUser.login_otp === otp) {
+      const roles = Object.values(foundUser.roles).filter(Boolean);
+
+      const accessToken = jwt.sign(
+        {
+          UserInfo: {
+            username: foundUser.username,
+            roles: roles,
+          },
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1h" }
+      );
+      const newRefreshToken = jwt.sign(
+        { username: foundUser.username },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      let newRefreshTokenArray = !cookies?.jwt
+        ? foundUser.refreshToken
+        : foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
+
+      if (cookies?.jwt) {
+        const refreshToken = cookies.jwt;
+        const foundToken = await User.findOne({ refreshToken }).exec();
+
+        if (!foundToken) {
+          newRefreshTokenArray = [];
+        }
+
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          sameSite: "None",
+          secure: true,
+        });
+      }
+
+      foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+      const result = await foundUser.save();
+
+      res.cookie("jwt", newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: "Giriş yapma işlemi başarılı!",
+        user: {
+          roles,
+          accessToken,
+          name: foundUser.name,
+          phone_code: foundUser.phone_code,
+          phone: foundUser.phone,
+          birth_date: foundUser.birth_date,
+          gender_id: foundUser.gender_id,
+          city_id: foundUser.city_id,
+          profile_picture: foundUser.profile_picture,
+          _id: foundUser._id,
+        },
+      });
+    } else {
+      res.status(200).json({
+        status: 400,
+        message: "Otp hatalı!",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
+const resendLoginOtp = async (req, res) => {
+  const { phone_code, phone } = req.body;
+
+  try {
+    const user = await User.findOne({
+      phone_code: phone_code,
+      phone: phone,
+      verified: true,
+    }).exec();
+
+    let otp = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
+    client.messages
+      .create({
+        body: "Onay kodunuz: " + otp,
+        from: "+12542384391",
+        to: phone_code + phone,
+      })
+      .then(() => {})
+      .catch(() => {});
+
+    user.login_otp = otp;
+    await user.save();
+
+    res.status(200).json({
+      status: 200,
+      message: "Otp yeniden gönderildi!",
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
+module.exports = { handleLogin, confirmLoginOtp, resendLoginOtp };
