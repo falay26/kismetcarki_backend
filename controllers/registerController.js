@@ -75,9 +75,21 @@ const confirmRegisterOtp = async (req, res) => {
       user.verified = true;
       await user.save();
 
+      const roles = Object.values(user.roles).filter(Boolean);
+
       res.status(200).json({
         status: 200,
-        //TODO: login logic here..
+        user: {
+          roles,
+          name: user.name,
+          phone_code: user.phone_code,
+          phone: user.phone,
+          birth_date: user.birth_date,
+          gender_id: user.gender_id,
+          city_id: user.city_id,
+          profile_picture: user.profile_picture,
+          _id: user._id,
+        },
         message: "Kullanıcı başarıyla aktifleştirildi!",
       });
     } else {
