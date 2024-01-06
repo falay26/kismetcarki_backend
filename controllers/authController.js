@@ -13,6 +13,8 @@ const handleLogin = async (req, res) => {
   const { phone_code, phone, pineapple } = req.body;
 
   try {
+    const cookies = req.cookies;
+
     const foundUser = await User.findOne({
       phone_code: phone_code,
       phone: phone,
