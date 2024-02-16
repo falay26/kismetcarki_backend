@@ -43,6 +43,9 @@ app.use("/login", require("./routes/auth/auth"));
 app.use("/confirm_login_otp", require("./routes/auth/confirm_login_otp"));
 app.use("/resend_login_otp", require("./routes/auth/resend_login_otp"));
 
+//Inside mobile
+app.use("/update_profile", require("./routes/update_profile"));
+
 /*
 app.use("/refresh", require("./routes/refresh"));
 app.use("/logout", require("./routes/logout"));

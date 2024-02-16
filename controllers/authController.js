@@ -182,21 +182,16 @@ const confirmLoginOtp = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
+      //user arragements
+      foundUser.roles = roles;
+      foundUser.refreshToken = "***Deleted for security reasons!***";
+      foundUser.register_otp = "***Deleted for security reasons!***";
+      foundUser.login_otp = "***Deleted for security reasons!***";
+
       res.status(200).json({
         status: 200,
         message: "Giriş yapma işlemi başarılı!",
-        user: {
-          roles,
-          accessToken,
-          name: foundUser.name,
-          phone_code: foundUser.phone_code,
-          phone: foundUser.phone,
-          birth_date: foundUser.birth_date,
-          gender_id: foundUser.gender_id,
-          city_id: foundUser.city_id,
-          profile_picture: foundUser.profile_picture,
-          _id: foundUser._id,
-        },
+        user: foundUser,
       });
     } else {
       res.status(200).json({

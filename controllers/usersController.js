@@ -1,4 +1,5 @@
 const User = require("../model/User");
+const jwt = require("jsonwebtoken");
 
 const getAllUsers = async (req, res) => {
   const users = await User.find();
@@ -31,8 +32,124 @@ const getUser = async (req, res) => {
   res.json(user);
 };
 
+const updateProfile = async (req, res) => {
+  const {
+    user_id,
+    phone_code,
+    phone,
+    name,
+    birth_date,
+    gender_id,
+    city_id,
+    profile_picture,
+    verified,
+    hobies,
+    about_me,
+    fav_movie,
+    fav_book,
+    fav_meal,
+    language_code,
+    frozen,
+    blockeds,
+    suitors,
+    user_type_id,
+    add_package,
+    packages,
+    themes,
+    selected_theme,
+    my_suitors,
+    already_seen,
+    matches,
+    fav_matches,
+    last_seen,
+    allow_notifications,
+    //Filters
+    school,
+    work,
+    marital,
+    children,
+    health,
+    hair,
+    skin,
+    height,
+    weight,
+    religion,
+    fltr_hobies,
+    fltr_fobies,
+    values,
+  } = req.body;
+
+  try {
+    const user = await User.findOne({
+      _id: user_id,
+    }).exec();
+
+    if (!user) return res.status(400).json({ message: "User not found" });
+    if (phone_code !== undefined) user.phone_code = phone_code;
+    if (phone !== undefined) user.phone = phone;
+    if (name !== undefined) user.name = name;
+    if (birth_date !== undefined) user.birth_date = birth_date;
+    if (gender_id !== undefined) user.gender_id = gender_id;
+    if (city_id !== undefined) user.city_id = city_id;
+    if (profile_picture !== undefined) user.profile_picture = profile_picture;
+    if (verified !== undefined) user.verified = verified;
+    if (hobies !== undefined) user.hobies = hobies;
+    if (about_me !== undefined) user.about_me = about_me;
+    if (fav_movie !== undefined) user.fav_movie = fav_movie;
+    if (fav_book !== undefined) user.fav_book = fav_book;
+    if (fav_meal !== undefined) user.fav_meal = fav_meal;
+    if (language_code !== undefined) user.language_code = language_code;
+    if (frozen !== undefined) user.frozen = frozen;
+    if (blockeds !== undefined) user.blockeds = blockeds;
+    if (suitors !== undefined) user.suitors = suitors;
+    if (user_type_id !== undefined) user.user_type_id = user_type_id;
+    if (add_package !== undefined) user.add_package = add_package;
+    if (packages !== undefined) user.packages = packages;
+    if (themes !== undefined) user.themes = themes;
+    if (selected_theme !== undefined) user.selected_theme = selected_theme;
+    if (my_suitors !== undefined) user.my_suitors = my_suitors;
+    if (already_seen !== undefined) user.already_seen = already_seen;
+    if (matches !== undefined) user.matches = matches;
+    if (fav_matches !== undefined) user.fav_matches = fav_matches;
+    if (last_seen !== undefined) user.last_seen = last_seen;
+    if (allow_notifications !== undefined)
+      user.allow_notifications = allow_notifications;
+    if (school !== undefined) user.school = school;
+    if (work !== undefined) user.work = work;
+    if (marital !== undefined) user.marital = marital;
+    if (children !== undefined) user.children = children;
+    if (health !== undefined) user.health = health;
+    if (hair !== undefined) user.hair = hair;
+    if (skin !== undefined) user.skin = skin;
+    if (height !== undefined) user.height = height;
+    if (weight !== undefined) user.weight = weight;
+    if (religion !== undefined) user.religion = religion;
+    if (fltr_hobies !== undefined) user.fltr_hobies = fltr_hobies;
+    if (fltr_fobies !== undefined) user.fltr_fobies = fltr_fobies;
+    if (values !== undefined) user.values = values;
+
+    await user.save();
+    const roles = Object.values(user.roles).filter(Boolean);
+
+    //user arragements
+    user.roles = roles;
+    user.refreshToken = "***Deleted for security reasons!***";
+    user.register_otp = "***Deleted for security reasons!***";
+    user.login_otp = "***Deleted for security reasons!***";
+
+    res.status(200).json({
+      status: 200,
+      message: "Kullanıcı başarıyla güncellendi!",
+      user: user,
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   deleteUser,
   getUser,
+  updateProfile,
 };
