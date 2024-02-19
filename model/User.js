@@ -121,42 +121,44 @@ const userSchema = new Schema(
     },
     //Filters
     school: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     work: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     marital: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     children: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     health: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     hair: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     skin: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     height: {
       type: Number,
+      default: null,
     },
     weight: {
       type: Number,
+      default: null,
     },
     religion: {
-      type: String,
-      default: "",
+      type: Number,
+      default: null,
     },
     fltr_hobies: {
       type: Array,
