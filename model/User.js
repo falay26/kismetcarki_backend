@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 
 const userSchema = new Schema(
   {
@@ -122,6 +123,14 @@ const userSchema = new Schema(
     allow_notifications: {
       type: Boolean,
       default: true,
+    },
+    allow_story: {
+      type: Boolean,
+      default: true,
+    },
+    in_story_with: {
+      type: ObjectId,
+      default: null,
     },
     //Filters
     school: {
