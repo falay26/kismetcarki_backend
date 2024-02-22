@@ -51,15 +51,19 @@ const userSchema = new Schema(
     },
     about_me: {
       type: String,
+      default: "",
     },
     fav_movie: {
       type: String,
+      default: "",
     },
     fav_book: {
       type: String,
+      default: "",
     },
     fav_meal: {
       type: String,
+      default: "",
     },
     language_code: {
       type: String,
