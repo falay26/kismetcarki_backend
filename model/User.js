@@ -84,6 +84,7 @@ const userSchema = new Schema(
     },
     user_type_id: {
       type: String,
+      default: "0",
     },
     add_package: {
       type: Boolean,
