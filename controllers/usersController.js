@@ -39,6 +39,7 @@ const updateProfile = async (req, res) => {
     phone,
     name,
     birth_date,
+    preferred_gender_id,
     gender_id,
     city_id,
     profile_picture,
@@ -89,6 +90,8 @@ const updateProfile = async (req, res) => {
     if (phone !== undefined) user.phone = phone;
     if (name !== undefined) user.name = name;
     if (birth_date !== undefined) user.birth_date = birth_date;
+    if (preferred_gender_id !== undefined)
+      user.preferred_gender_id = preferred_gender_id;
     if (gender_id !== undefined) user.gender_id = gender_id;
     if (city_id !== undefined) user.city_id = city_id;
     if (profile_picture !== undefined) user.profile_picture = profile_picture;
@@ -147,9 +150,43 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const findFortune = async (req, res) => {
+  const { user_id, preferred_gender_id, filters } = req.body;
+
+  try {
+    const user = await User.findOne({
+      _id: { $ne: user_id },
+      gender_id: preferred_gender_id,
+    }).exec();
+    if (user) {
+      const roles = Object.values(user.roles).filter(Boolean);
+
+      //user arragements
+      user.roles = roles;
+      user.refreshToken = "***Deleted for security reasons!***";
+      user.register_otp = "***Deleted for security reasons!***";
+      user.login_otp = "***Deleted for security reasons!***";
+
+      res.status(200).json({
+        status: 200,
+        message: "Kullanıcı başarıyla bulundu!",
+        user: user,
+      });
+    } else {
+      res.status(400).json({
+        status: 400,
+        message: "Kullanıcı bulunamadı.",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   deleteUser,
   getUser,
   updateProfile,
+  findFortune,
 };

@@ -29,6 +29,11 @@ const userSchema = new Schema(
     },
     gender_id: {
       type: String,
+      default: "0",
+    },
+    preferred_gender_id: {
+      type: String,
+      default: "0",
     },
     city_id: {
       type: String,

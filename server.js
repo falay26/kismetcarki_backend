@@ -45,6 +45,7 @@ app.use("/resend_login_otp", require("./routes/auth/resend_login_otp"));
 
 //Inside mobile
 app.use("/update_profile", require("./routes/update_profile"));
+app.use("/find_fortune", require("./routes/find_fortune"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));
