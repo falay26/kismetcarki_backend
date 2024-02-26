@@ -188,10 +188,18 @@ const findFortune = async (req, res) => {
         );
 
       if (finals.length !== 0) {
-        mainUser.already_seen.concat([
+        mainUser.already_seen = mainUser.already_seen.concat([
           { id: finals[0].id, date: new Date.now() },
         ]);
         await mainUser.save(); //Added to seen list.
+
+        const roles1 = Object.values(mainUser.roles).filter(Boolean);
+
+        //user arragements
+        mainUser.roles = roles1;
+        mainUser.refreshToken = "***Deleted for security reasons!***";
+        mainUser.register_otp = "***Deleted for security reasons!***";
+        mainUser.login_otp = "***Deleted for security reasons!***";
 
         const roles = Object.values(finals[0].roles).filter(Boolean);
 
