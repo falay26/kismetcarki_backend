@@ -150,28 +150,69 @@ const updateProfile = async (req, res) => {
   }
 };
 
+function datediff(first, second) {
+  return Math.round((second - first) / (1000 * 60 * 60 * 24));
+}
+
 const findFortune = async (req, res) => {
   const { user_id, preferred_gender_id, filters } = req.body;
 
   try {
-    const user = await User.findOne({
+    const mainUser = await User.findOne({
+      _id: user_id,
+    }).exec();
+    if (!mainUser)
+      return res.status(400).json({
+        status: 400,
+        message: "Kullanıcı bulunamadı.",
+      });
+
+    const users = await User.find({
       _id: { $ne: user_id },
       gender_id: preferred_gender_id,
     }).exec();
-    if (user) {
-      const roles = Object.values(user.roles).filter(Boolean);
 
-      //user arragements
-      user.roles = roles;
-      user.refreshToken = "***Deleted for security reasons!***";
-      user.register_otp = "***Deleted for security reasons!***";
-      user.login_otp = "***Deleted for security reasons!***";
+    if (users) {
+      let finals = users
+        .filter((i) => !mainUser.blockeds.includes(i._id)) //Engelliler
+        .filter(
+          (i) =>
+            !mainUser.already_seen
+              .filter((j) => {
+                if (datediff(j.date, new Date.now()) > 28) {
+                  //28 gündür görmedikleri..
+                  return j.id;
+                }
+              })
+              .includes(i._id)
+        );
 
-      res.status(200).json({
-        status: 200,
-        message: "Kullanıcı başarıyla bulundu!",
-        user: user,
-      });
+      if (finals.length !== 0) {
+        mainUser.already_seen.concat([
+          { id: finals[0].id, date: new Date.now() },
+        ]);
+        await mainUser.save(); //Added to seen list.
+
+        const roles = Object.values(finals[0].roles).filter(Boolean);
+
+        //user arragements
+        finals[0].roles = roles;
+        finals[0].refreshToken = "***Deleted for security reasons!***";
+        finals[0].register_otp = "***Deleted for security reasons!***";
+        finals[0].login_otp = "***Deleted for security reasons!***";
+
+        res.status(200).json({
+          status: 200,
+          message: "Kullanıcı başarıyla bulundu!",
+          user: finals[0],
+          main_user: mainUser,
+        });
+      } else {
+        res.status(400).json({
+          status: 400,
+          message: "Kullanıcı bulunamadı.",
+        });
+      }
     } else {
       res.status(400).json({
         status: 400,
