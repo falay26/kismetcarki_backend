@@ -46,6 +46,10 @@ app.use("/resend_login_otp", require("./routes/auth/resend_login_otp"));
 //Inside mobile
 app.use("/update_profile", require("./routes/update_profile"));
 app.use("/find_fortune", require("./routes/find_fortune"));
+app.use("/get_user", require("./routes/get_user"));
+app.use("/add_photo", require("./routes/photo/add_photo"));
+app.use("/get_photos", require("./routes/photo/get_all"));
+app.use("/delete_photo", require("./routes/photo/delete_photo"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));

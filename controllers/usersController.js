@@ -1,5 +1,5 @@
 const User = require("../model/User");
-const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const getAllUsers = async (req, res) => {
   const users = await User.find();
@@ -21,15 +21,29 @@ const deleteUser = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  if (!req?.params?.id)
-    return res.status(400).json({ message: "User ID required" });
-  const user = await User.findOne({ _id: req.params.id }).exec();
-  if (!user) {
-    return res
-      .status(204)
-      .json({ message: `User ID ${req.params.id} not found` });
+  const { user_id } = req.body;
+
+  try {
+    const user = await User.findOne({
+      _id: user_id,
+    }).exec();
+
+    const roles = Object.values(user.roles).filter(Boolean);
+
+    //user arragements
+    user.roles = roles;
+    user.refreshToken = "***Deleted for security reasons!***";
+    user.register_otp = "***Deleted for security reasons!***";
+    user.login_otp = "***Deleted for security reasons!***";
+
+    res.status(200).json({
+      status: 200,
+      message: "Kullanıcı başarıyla güncellendi!",
+      user: user,
+    });
+  } catch {
+    res.status(500).json({ status: 500, message: err.message });
   }
-  res.json(user);
 };
 
 const updateProfile = async (req, res) => {
@@ -104,7 +118,16 @@ const updateProfile = async (req, res) => {
     if (language_code !== undefined) user.language_code = language_code;
     if (frozen !== undefined) user.frozen = frozen;
     if (blockeds !== undefined) user.blockeds = blockeds;
-    if (suitors !== undefined) user.suitors = suitors;
+    if (suitors !== undefined) {
+      user.suitors = suitors;
+      let suitted_id = suitors[suitors.length - 1].id;
+      const suitted_user = await User.findOne({
+        _id: suitted_id,
+      }).exec();
+      suitted_user.my_suitors = suitted_user.my_suitors.concat([user_id]);
+      await suitted_user.save();
+      //TODO: notification..
+    }
     if (user_type_id !== undefined) user.user_type_id = user_type_id;
     if (add_package !== undefined) user.add_package = add_package;
     if (packages !== undefined) user.packages = packages;
@@ -112,7 +135,17 @@ const updateProfile = async (req, res) => {
     if (selected_theme !== undefined) user.selected_theme = selected_theme;
     if (my_suitors !== undefined) user.my_suitors = my_suitors;
     if (already_seen !== undefined) user.already_seen = already_seen;
-    if (matches !== undefined) user.matches = matches;
+    if (matches !== undefined) {
+      user.matches = matches;
+      let matched_id = matches[matches.length - 1];
+      const matched_user = await User.findOne({
+        _id: matched_id,
+      }).exec();
+      matched_user.matches = matched_user.matches.concat([user_id]);
+      await matched_user.save();
+      //TODO: massages..
+      //TODO: notification..
+    }
     if (fav_matches !== undefined) user.fav_matches = fav_matches;
     if (last_seen !== undefined) user.last_seen = last_seen;
     if (allow_notifications !== undefined)
@@ -151,7 +184,9 @@ const updateProfile = async (req, res) => {
 };
 
 function datediff(first, second) {
-  return Math.round((second - first) / (1000 * 60 * 60 * 24));
+  return Math.round(
+    (Date.parse(second) - Date.parse(first)) / (1000 * 60 * 60 * 24)
+  );
 }
 
 const findFortune = async (req, res) => {
@@ -170,26 +205,32 @@ const findFortune = async (req, res) => {
     const users = await User.find({
       _id: { $ne: user_id },
       gender_id: preferred_gender_id,
+      verified: true,
     }).exec();
 
     if (users) {
+      let seen_list = mainUser.already_seen
+        .filter((i) => {
+          if (datediff(i.date, new Date()) < 28) {
+            return i.id;
+          }
+        })
+        .map((i) => i.id);
+
       let finals = users
-        .filter((i) => !mainUser.blockeds.includes(i._id)) //Engelliler
-        .filter(
-          (i) =>
-            !mainUser.already_seen
-              .filter((j) => {
-                if (datediff(j.date, new Date.now()) > 28) {
-                  //28 gündür görmedikleri..
-                  return j.id;
-                }
-              })
-              .includes(i._id)
-        );
+        .filter((i) => !mainUser.blockeds.includes(i._id)) //Engelliler.
+        .filter((j) => !seen_list.includes(j.id)); //28 gün içinde görülenler.
+      if (filters.children.length !== 0 || filters.children.length !== 2) {
+        finals.filter((i) => filters.children.includes(i.children));
+      } //Çocuk filtresi
+      if (filters.education.length !== 0 || filters.education.length !== 7) {
+        finals.filter((i) => filters.education.includes(i.school));
+      } //Eğitim filtresi
 
       if (finals.length !== 0) {
+        let date = new Date();
         mainUser.already_seen = mainUser.already_seen.concat([
-          { id: finals[0].id, date: new Date.now() },
+          { id: finals[0].id, date: date },
         ]);
         await mainUser.save(); //Added to seen list.
 
