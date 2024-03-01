@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const socket = require("socket.io");
 const path = require("path");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
@@ -50,6 +51,9 @@ app.use("/get_user", require("./routes/get_user"));
 app.use("/add_photo", require("./routes/photo/add_photo"));
 app.use("/get_photos", require("./routes/photo/get_all"));
 app.use("/delete_photo", require("./routes/photo/delete_photo"));
+app.use("/get_messages", require("./routes/message/get_messages"));
+app.use("/send_message", require("./routes/message/send_message"));
+app.use("/read_messages", require("./routes/message/read_messages"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));
@@ -73,5 +77,25 @@ app.all("*", (req, res) => {
 app.use(errorHandler);
 
 mongoose.connection.once("open", () => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  const server = app.listen(PORT, () =>
+    console.log(`Server running on port ${PORT}`)
+  );
+
+  const io = socket(server);
+
+  global.onlineUsers = new Map();
+
+  io.on("connection", (socket) => {
+    global.chatSocket = socket;
+    socket.on("add-user", (userıd) => {
+      onlineUsers.set(userıd, socket.id);
+    });
+
+    socket.on("send-msg", (data) => {
+      const sendUserSocket = onlineUsers.get(data.to);
+      if (sendUserSocket) {
+        socket.to(sendUserSocket).emit("msg-recieve");
+      }
+    });
+  });
 });

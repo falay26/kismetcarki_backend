@@ -1,4 +1,5 @@
 const User = require("../model/User");
+const Message = require("../model/Message");
 const mongoose = require("mongoose");
 
 const getAllUsers = async (req, res) => {
@@ -119,12 +120,15 @@ const updateProfile = async (req, res) => {
     if (frozen !== undefined) user.frozen = frozen;
     if (blockeds !== undefined) user.blockeds = blockeds;
     if (suitors !== undefined) {
+      let date = new Date();
       user.suitors = suitors;
       let suitted_id = suitors[suitors.length - 1].id;
       const suitted_user = await User.findOne({
         _id: suitted_id,
       }).exec();
-      suitted_user.my_suitors = suitted_user.my_suitors.concat([user_id]);
+      suitted_user.my_suitors = suitted_user.my_suitors.concat([
+        { id: user_id, date: date },
+      ]);
       await suitted_user.save();
       //TODO: notification..
     }
@@ -137,13 +141,57 @@ const updateProfile = async (req, res) => {
     if (already_seen !== undefined) user.already_seen = already_seen;
     if (matches !== undefined) {
       user.matches = matches;
+      user.my_suitors = user.my_suitors.filter(
+        (i) => i.id !== matches[matches.length - 1]
+      );
       let matched_id = matches[matches.length - 1];
       const matched_user = await User.findOne({
         _id: matched_id,
       }).exec();
       matched_user.matches = matched_user.matches.concat([user_id]);
       await matched_user.save();
-      //TODO: massages..
+
+      const messages = await Message.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                sender_id: mongoose.Types.ObjectId(user_id),
+                reciever_id: mongoose.Types.ObjectId(matched_id),
+              },
+              {
+                sender_id: mongoose.Types.ObjectId(matched_id),
+                reciever_id: mongoose.Types.ObjectId(user_id),
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "sender_id",
+            foreignField: "_id",
+            as: "sender_info",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "reciever_id",
+            foreignField: "_id",
+            as: "reciever_info",
+          },
+        },
+      ]);
+
+      if (messages.length === 0) {
+        await Message.create({
+          sender_id: user_id,
+          reciever_id: matched_id,
+        });
+        //Mesajlar başarıyla oluşturuldu.
+      }
+
       //TODO: notification..
     }
     if (fav_matches !== undefined) user.fav_matches = fav_matches;
