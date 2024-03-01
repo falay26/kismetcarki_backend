@@ -54,6 +54,9 @@ app.use("/delete_photo", require("./routes/photo/delete_photo"));
 app.use("/get_messages", require("./routes/message/get_messages"));
 app.use("/send_message", require("./routes/message/send_message"));
 app.use("/read_messages", require("./routes/message/read_messages"));
+app.use("/start_chat", require("./routes/chat/start_chat"));
+app.use("/get_chats", require("./routes/chat/get_chats"));
+app.use("/send_chat", require("./routes/chat/send_chat"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));
