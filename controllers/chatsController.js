@@ -67,9 +67,9 @@ const sendChatMessage = async (req, res) => {
     const chat = await Chat.findOne({ _id: chat_id }).exec();
 
     message_sended.date = new Date();
-    message.messages = message.messages.concat([message_sended]);
+    chat.messages = chat.messages.concat([message_sended]);
 
-    const sender_id = message.sender_id.toString();
+    const sender_id = message_sended.sender.toString();
     let participants_array = chat.participants.map((i) => i._id);
     if (!participants_array.includes(sender_id)) {
       chat.participants = chat.participants.concat([{ _id: sender_id }]);
