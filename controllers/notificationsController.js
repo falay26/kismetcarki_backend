@@ -1,4 +1,3 @@
-const User = require("../model/User");
 const mongoose = require("mongoose");
 //Notification
 const Notification = require("../model/Notification");
@@ -10,7 +9,7 @@ const getNotifications = async (req, res) => {
     const notifications = await Notification.aggregate([
       {
         $match: {
-          owner: mongoose.Types.ObjectId(user_id),
+          owner_id: mongoose.Types.ObjectId(user_id),
         },
       },
       {

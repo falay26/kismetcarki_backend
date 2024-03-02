@@ -166,7 +166,7 @@ const updateProfile = async (req, res) => {
       await Notification.create({
         owner_id: user._id,
         type: 4,
-        related_id: "",
+        related_id: null,
         readed: false,
       });
     }
@@ -176,7 +176,7 @@ const updateProfile = async (req, res) => {
       await Notification.create({
         owner_id: user._id,
         type: 3,
-        related_id: "",
+        related_id: null,
         readed: false,
       });
     }
