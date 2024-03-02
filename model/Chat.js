@@ -17,7 +17,7 @@ const chatSchema = new Schema(
       type: String,
     },
     participants: {
-      type: Array,
+      type: [{ _id: { type: ObjectId } }],
       default: [],
     },
     messages: {

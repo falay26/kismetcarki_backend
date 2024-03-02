@@ -34,6 +34,20 @@ const getAllChats = async (req, res) => {
           as: "users_info",
         },
       },
+      {
+        $group: {
+          _id: "$_id",
+          owner_id: { $first: "$owner_id" },
+          title: { $first: "$title" },
+          sub_title: { $first: "$sub_title" },
+          picture: { $first: "$picture" },
+          users_info: {
+            $first: "$users_info",
+          },
+          messages: { $first: "$messages" },
+          participants: { $push: "$participants" },
+        },
+      },
     ]);
 
     res.status(200).json({
