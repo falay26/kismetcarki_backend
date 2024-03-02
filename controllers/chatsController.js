@@ -25,27 +25,12 @@ const startChat = async (req, res) => {
 const getAllChats = async (req, res) => {
   try {
     const chats = await Chat.aggregate([
-      { $unwind: "$participants" },
       {
         $lookup: {
           from: "users",
           localField: "participants._id",
           foreignField: "_id",
           as: "users_info",
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          owner_id: { $first: "$owner_id" },
-          title: { $first: "$title" },
-          sub_title: { $first: "$sub_title" },
-          picture: { $first: "$picture" },
-          users_info: {
-            $first: "$users_info",
-          },
-          messages: { $first: "$messages" },
-          participants: { $push: "$participants" },
         },
       },
     ]);
@@ -70,7 +55,7 @@ const sendChatMessage = async (req, res) => {
     chat.messages = chat.messages.concat([message_sended]);
 
     const sender_id = message_sended.sender.toString();
-    let participants_array = chat.participants.map((i) => i._id);
+    let participants_array = chat.participants.map((i) => i._id.toString());
     if (!participants_array.includes(sender_id)) {
       chat.participants = chat.participants.concat([{ _id: sender_id }]);
     }

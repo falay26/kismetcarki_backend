@@ -1,6 +1,11 @@
 const User = require("../model/User");
 const Message = require("../model/Message");
 const mongoose = require("mongoose");
+//Notification
+const Notification = require("../model/Notification");
+var FCM = require("fcm-node");
+var serverKey = process.env.FIREBASE_SERVER_KEY;
+var fcm = new FCM(serverKey);
 
 const getAllMessages = async (req, res) => {
   const { user_id } = req.body;
@@ -53,9 +58,6 @@ const sendMessage = async (req, res) => {
   try {
     const message = await Message.findOne({ _id: message_id }).exec();
 
-    message_sended.date = new Date();
-    message.messages = message.messages.concat([message_sended]);
-
     const sender_id =
       message.sender_id.toString() === message_sended.sender
         ? message.reciever_id
@@ -64,6 +66,46 @@ const sendMessage = async (req, res) => {
       _id: message_sended.sender,
     }).exec();
     const reciever_user = await User.findOne({ _id: sender_id }).exec();
+
+    if (message.messages.length === 0) {
+      var message1 = {
+        to: reciever_user.notification_token,
+        notification: {
+          title: "Kısmet Çarkı",
+          body: sender_user.name + " sana mesaj gönderdi⚡️",
+        },
+      };
+
+      await Notification.create({
+        owner_id: reciever_user._id,
+        type: 1,
+        related_id: sender_user._id,
+        readed: false,
+      });
+
+      fcm.send(message1, function (err, response) {
+        if (err) {
+        } else {
+        }
+      });
+    } else {
+      var message1 = {
+        to: reciever_user.notification_token,
+        notification: {
+          title: "Kısmet Çarkı",
+          body: sender_user.name + " sana mesaj gönderdi⚡️",
+        },
+      };
+
+      fcm.send(message1, function (err, response) {
+        if (err) {
+        } else {
+        }
+      });
+    }
+
+    message_sended.date = new Date();
+    message.messages = message.messages.concat([message_sended]);
 
     await message.markModified("messages");
     await message.save();

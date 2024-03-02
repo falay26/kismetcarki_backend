@@ -57,6 +57,7 @@ app.use("/read_messages", require("./routes/message/read_messages"));
 app.use("/start_chat", require("./routes/chat/start_chat"));
 app.use("/get_chats", require("./routes/chat/get_chats"));
 app.use("/send_chat", require("./routes/chat/send_chat"));
+app.use("/get_notifications", require("./routes/get_notifications"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));

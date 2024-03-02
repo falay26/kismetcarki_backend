@@ -1,6 +1,11 @@
 const User = require("../model/User");
 const Message = require("../model/Message");
 const mongoose = require("mongoose");
+//Notification
+const Notification = require("../model/Notification");
+var FCM = require("fcm-node");
+var serverKey = process.env.FIREBASE_SERVER_KEY;
+var fcm = new FCM(serverKey);
 
 const getAllUsers = async (req, res) => {
   const users = await User.find();
@@ -57,6 +62,7 @@ const updateProfile = async (req, res) => {
     preferred_gender_id,
     gender_id,
     city_id,
+    notification_token,
     profile_picture,
     verified,
     hobies,
@@ -109,6 +115,8 @@ const updateProfile = async (req, res) => {
       user.preferred_gender_id = preferred_gender_id;
     if (gender_id !== undefined) user.gender_id = gender_id;
     if (city_id !== undefined) user.city_id = city_id;
+    if (notification_token !== undefined)
+      user.notification_token = notification_token;
     if (profile_picture !== undefined) user.profile_picture = profile_picture;
     if (verified !== undefined) user.verified = verified;
     if (hobies !== undefined) user.hobies = hobies;
@@ -130,10 +138,48 @@ const updateProfile = async (req, res) => {
         { id: user_id, date: date },
       ]);
       await suitted_user.save();
-      //TODO: notification..
+
+      var message = {
+        to: suitted_user.notification_token,
+        notification: {
+          title: "Kısmet Çarkı",
+          body: user.name + " sana talip oldu.👩‍❤️‍👨💟",
+        },
+      };
+
+      await Notification.create({
+        owner_id: user._id,
+        type: 0,
+        related_id: suitted_user._id,
+        readed: false,
+      });
+
+      fcm.send(message, function (err, response) {
+        if (err) {
+        } else {
+        }
+      });
     }
-    if (user_type_id !== undefined) user.user_type_id = user_type_id;
-    if (add_package !== undefined) user.add_package = add_package;
+    if (user_type_id !== undefined) {
+      user.user_type_id = user_type_id;
+
+      await Notification.create({
+        owner_id: user._id,
+        type: 4,
+        related_id: "",
+        readed: false,
+      });
+    }
+    if (add_package !== undefined) {
+      user.add_package = add_package;
+
+      await Notification.create({
+        owner_id: user._id,
+        type: 3,
+        related_id: "",
+        readed: false,
+      });
+    }
     if (packages !== undefined) user.packages = packages;
     if (themes !== undefined) user.themes = themes;
     if (selected_theme !== undefined) user.selected_theme = selected_theme;
@@ -192,7 +238,26 @@ const updateProfile = async (req, res) => {
         //Mesajlar başarıyla oluşturuldu.
       }
 
-      //TODO: notification..
+      var message = {
+        to: matched_user.notification_token,
+        notification: {
+          title: "Kısmet Çarkı",
+          body: user.name + " talip olma istegini kabul etti.💌💌",
+        },
+      };
+
+      await Notification.create({
+        owner_id: matched_user._id,
+        type: 0,
+        related_id: user._id,
+        readed: false,
+      });
+
+      fcm.send(message, function (err, response) {
+        if (err) {
+        } else {
+        }
+      });
     }
     if (fav_matches !== undefined) user.fav_matches = fav_matches;
     if (last_seen !== undefined) user.last_seen = last_seen;

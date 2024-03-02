@@ -38,6 +38,9 @@ const userSchema = new Schema(
     city_id: {
       type: String,
     },
+    notification_token: {
+      type: String,
+    },
     profile_picture: {
       type: String,
     },
