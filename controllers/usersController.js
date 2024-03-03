@@ -315,9 +315,14 @@ const findFortune = async (req, res) => {
         message: "Kullanıcı bulunamadı.",
       });
 
+    let used_gender =
+      preferred_gender_id.length === 0 || preferred_gender_id.length === 2
+        ? ["0", "1", "2"]
+        : preferred_gender_id;
+
     const users = await User.find({
       _id: { $ne: user_id },
-      gender_id: preferred_gender_id,
+      gender_id: { $in: used_gender },
       verified: true,
     }).exec();
 
