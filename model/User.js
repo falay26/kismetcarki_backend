@@ -133,6 +133,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    story_requests: {
+      type: Array,
+      default: [],
+    },
     allow_story: {
       type: Boolean,
       default: true,

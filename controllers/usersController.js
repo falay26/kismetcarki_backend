@@ -85,6 +85,9 @@ const updateProfile = async (req, res) => {
     fav_matches,
     last_seen,
     allow_notifications,
+    story_requests,
+    allow_story,
+    in_story_with,
     //Filters
     school,
     work,
@@ -263,6 +266,51 @@ const updateProfile = async (req, res) => {
     if (last_seen !== undefined) user.last_seen = last_seen;
     if (allow_notifications !== undefined)
       user.allow_notifications = allow_notifications;
+    if (story_requests !== undefined) {
+      user.story_requests = story_requests;
+
+      const storied_id = story_requests[story_requests.length - 1];
+      const storied_user = await User.findOne({
+        _id: storied_id,
+      }).exec();
+
+      var message = {
+        to: storied_user.notification_token,
+        notification: {
+          title: "Kısmet Çarkı",
+          body: user.name + " ortak hikaye talebi gönderdi.💌",
+        },
+      };
+
+      await Notification.create({
+        owner_id: storied_user._id,
+        type: 0,
+        related_id: user._id,
+        readed: false,
+      });
+
+      fcm.send(message, function (err, response) {
+        if (err) {
+        } else {
+        }
+      });
+    }
+    if (allow_story !== undefined) user.allow_story = allow_story;
+    if (in_story_with !== undefined) {
+      user.in_story_with = in_story_with;
+
+      const storied_id = in_story_with;
+      const storied_user = await User.findOne({
+        _id: storied_id,
+      }).exec();
+
+      storied_user.story_requests = storied_user.story_requests.filter(
+        (i) => i !== user._id
+      );
+      storied_user.in_story_with = user._id;
+      await storied_user.save();
+    }
+    if (school !== undefined) user.school = school;
     if (school !== undefined) user.school = school;
     if (work !== undefined) user.work = work;
     if (marital !== undefined) user.marital = marital;
