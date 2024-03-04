@@ -368,6 +368,8 @@ const findFortune = async (req, res) => {
         ? ["0", "1", "2"]
         : preferred_gender_id;
 
+    //TODO: other filters
+
     const users = await User.find({
       _id: { $ne: user_id },
       gender_id: { $in: used_gender },
