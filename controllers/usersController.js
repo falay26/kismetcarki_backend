@@ -151,9 +151,9 @@ const updateProfile = async (req, res) => {
       };
 
       await Notification.create({
-        owner_id: user._id,
+        owner_id: suitted_user._id,
         type: 0,
-        related_id: suitted_user._id,
+        related_id: user._id,
         readed: false,
       });
 
@@ -284,7 +284,7 @@ const updateProfile = async (req, res) => {
 
       await Notification.create({
         owner_id: storied_user._id,
-        type: 0,
+        type: 6,
         related_id: user._id,
         readed: false,
       });
@@ -377,7 +377,7 @@ const findFortune = async (req, res) => {
     if (users) {
       let seen_list = mainUser.already_seen
         .filter((i) => {
-          if (datediff(i.date, new Date()) < 28) {
+          if (datediff(i.date, new Date()) < 1) {
             return i.id;
           }
         })
