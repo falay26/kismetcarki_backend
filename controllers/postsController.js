@@ -67,7 +67,7 @@ const getPosts = async (req, res) => {
               owner_id0: mongoose.Types.ObjectId(user_id),
             },
             {
-              owner_id0: mongoose.Types.ObjectId(user_id),
+              owner_id1: mongoose.Types.ObjectId(user_id),
             },
           ],
         },
