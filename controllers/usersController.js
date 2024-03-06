@@ -52,6 +52,24 @@ const getUser = async (req, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  const { users } = req.body;
+
+  try {
+    const found_users = await User.find({
+      _id: { $in: users },
+    }).exec();
+
+    res.status(200).json({
+      status: 200,
+      message: "Kullanıcılar başarıyla bulundu!",
+      users: found_users,
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
 const updateProfile = async (req, res) => {
   const {
     user_id,
@@ -445,6 +463,7 @@ module.exports = {
   getAllUsers,
   deleteUser,
   getUser,
+  getUsers,
   updateProfile,
   findFortune,
 };
