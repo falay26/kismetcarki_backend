@@ -95,8 +95,8 @@ mongoose.connection.once("open", () => {
 
   io.on("connection", (socket) => {
     global.chatSocket = socket;
-    socket.on("add-user", (userıd) => {
-      onlineUsers.set(userıd, socket.id);
+    socket.on("add-user", (userId) => {
+      onlineUsers.set(userId, socket.id);
     });
 
     socket.on("send-msg", (data) => {
