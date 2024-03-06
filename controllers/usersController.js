@@ -47,7 +47,7 @@ const getUser = async (req, res) => {
       message: "Kullanıcı başarıyla güncellendi!",
       user: user,
     });
-  } catch {
+  } catch (err) {
     res.status(500).json({ status: 500, message: err.message });
   }
 };
