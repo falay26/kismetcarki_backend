@@ -100,6 +100,8 @@ const updateProfile = async (req, res) => {
     my_suitors,
     already_seen,
     matches,
+    unmatched_user_id, //To use
+    message_id, //To use
     fav_matches,
     last_seen,
     allow_notifications,
@@ -207,78 +209,92 @@ const updateProfile = async (req, res) => {
     if (my_suitors !== undefined) user.my_suitors = my_suitors;
     if (already_seen !== undefined) user.already_seen = already_seen;
     if (matches !== undefined) {
-      user.matches = matches;
-      user.my_suitors = user.my_suitors.filter(
-        (i) => i.id !== matches[matches.length - 1]
-      );
-      let matched_id = matches[matches.length - 1];
-      const matched_user = await User.findOne({
-        _id: matched_id,
-      }).exec();
-      matched_user.matches = matched_user.matches.concat([user_id]);
-      await matched_user.save();
+      if (matches.length > user.matches.length) {
+        user.matches = matches;
+        user.my_suitors = user.my_suitors.filter(
+          (i) => i.id !== matches[matches.length - 1]
+        );
+        let matched_id = matches[matches.length - 1];
+        const matched_user = await User.findOne({
+          _id: matched_id,
+        }).exec();
+        matched_user.matches = matched_user.matches.concat([user_id]);
+        await matched_user.save();
 
-      const messages = await Message.aggregate([
-        {
-          $match: {
-            $or: [
-              {
-                sender_id: mongoose.Types.ObjectId(user_id),
-                reciever_id: mongoose.Types.ObjectId(matched_id),
-              },
-              {
-                sender_id: mongoose.Types.ObjectId(matched_id),
-                reciever_id: mongoose.Types.ObjectId(user_id),
-              },
-            ],
+        const messages = await Message.aggregate([
+          {
+            $match: {
+              $or: [
+                {
+                  sender_id: mongoose.Types.ObjectId(user_id),
+                  reciever_id: mongoose.Types.ObjectId(matched_id),
+                },
+                {
+                  sender_id: mongoose.Types.ObjectId(matched_id),
+                  reciever_id: mongoose.Types.ObjectId(user_id),
+                },
+              ],
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "sender_id",
-            foreignField: "_id",
-            as: "sender_info",
+          {
+            $lookup: {
+              from: "users",
+              localField: "sender_id",
+              foreignField: "_id",
+              as: "sender_info",
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "reciever_id",
-            foreignField: "_id",
-            as: "reciever_info",
+          {
+            $lookup: {
+              from: "users",
+              localField: "reciever_id",
+              foreignField: "_id",
+              as: "reciever_info",
+            },
           },
-        },
-      ]);
+        ]);
 
-      if (messages.length === 0) {
-        await Message.create({
-          sender_id: user_id,
-          reciever_id: matched_id,
-        });
-        //Mesajlar başarıyla oluşturuldu.
-      }
-
-      var message = {
-        to: matched_user.notification_token,
-        notification: {
-          title: "Kısmet Çarkı",
-          body: user.name + " talip olma istegini kabul etti.💌💌",
-        },
-      };
-
-      await Notification.create({
-        owner_id: matched_user._id,
-        type: 0,
-        related_id: user._id,
-        readed: false,
-      });
-
-      fcm.send(message, function (err, response) {
-        if (err) {
-        } else {
+        if (messages.length === 0) {
+          await Message.create({
+            sender_id: user_id,
+            reciever_id: matched_id,
+          });
+          //Mesajlar başarıyla oluşturuldu.
         }
-      });
+
+        var message = {
+          to: matched_user.notification_token,
+          notification: {
+            title: "Kısmet Çarkı",
+            body: user.name + " talip olma istegini kabul etti.💌💌",
+          },
+        };
+
+        await Notification.create({
+          owner_id: matched_user._id,
+          type: 0,
+          related_id: user._id,
+          readed: false,
+        });
+
+        fcm.send(message, function (err, response) {
+          if (err) {
+          } else {
+          }
+        });
+      } else {
+        user.matches = matches;
+        const matched_user = await User.findOne({
+          _id: unmatched_user_id,
+        }).exec();
+        matched_user.matches = matched_user.matches.filter(
+          (i) => i !== user_id
+        );
+        await matched_user.save();
+        await Message.findOneAndDelete({
+          _id: message_id,
+        });
+      }
     }
     if (fav_matches !== undefined) user.fav_matches = fav_matches;
     if (last_seen !== undefined) user.last_seen = last_seen;
