@@ -403,35 +403,35 @@ const findFortune = async (req, res) => {
         : preferred_gender_id;
     let used_school =
       filters?.education?.length === 0 || filters?.education?.length === 7
-        ? [1, 2, 3, 4, 5, 6, 7]
+        ? [null, 1, 2, 3, 4, 5, 6, 7]
         : filters?.education.map((i) => Number(i));
     let used_work =
       filters?.work?.length === 0 || filters?.work?.length === 7
-        ? [1, 2, 3, 4, 5, 6, 7]
+        ? [null, 1, 2, 3, 4, 5, 6, 7]
         : filters?.work?.map((i) => Number(i));
     let used_marital =
       filters?.marital?.length === 0 || filters?.marital?.length === 2
-        ? [1, 2]
+        ? [null, 1, 2]
         : filters?.marital?.map((i) => Number(i));
     let used_children =
       filters?.children?.length === 0 || filters?.children?.length === 2
-        ? [1, 2]
+        ? [null, 1, 2]
         : filters?.children?.map((i) => Number(i));
     let used_health =
       filters?.health?.length === 0 || filters?.health?.length === 2
-        ? [1, 2]
+        ? [null, 1, 2]
         : filters?.health?.map((i) => Number(i));
     let used_hair =
       filters?.hair?.length === 0 || filters?.hair?.length === 3
-        ? [1, 2, 3]
+        ? [null, 1, 2, 3]
         : filters?.hair?.map((i) => Number(i));
     let used_skin =
       filters?.skin?.length === 0 || filters?.skin?.length === 3
-        ? [1, 2, 3]
+        ? [null, 1, 2, 3]
         : filters?.skin?.map((i) => Number(i));
     let used_religion =
       filters?.faith?.length === 0 || filters?.faith?.length === 3
-        ? [1, 2, 3, 4, 5, 6, 7]
+        ? [null, 1, 2, 3, 4, 5, 6, 7]
         : filters?.faith?.map((i) => Number(i));
 
     const users = await User.find({
