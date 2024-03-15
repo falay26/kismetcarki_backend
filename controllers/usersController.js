@@ -211,9 +211,14 @@ const updateProfile = async (req, res) => {
     if (matches !== undefined) {
       if (matches.length > user.matches.length) {
         user.matches = matches;
-        user.my_suitors = user.my_suitors.filter(
-          (i) => i.id !== matches[matches.length - 1]
-        );
+        user.my_suitors = user.my_suitors.map((i) => {
+          if (i.id !== matches[matches.length - 1]) {
+            return i;
+          } else {
+            let new_i = { id: i.id, date: i.date, seen: true };
+            return new_i;
+          }
+        });
         let matched_id = matches[matches.length - 1];
         const matched_user = await User.findOne({
           _id: matched_id,
