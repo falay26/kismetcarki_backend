@@ -42,7 +42,7 @@ const handleNewUser = async (req, res) => {
       .then(() => {})
       .catch(() => {});
 
-    await User.create({
+    const user = await User.create({
       phone_code: phone_code,
       phone: phone,
       name: name,
@@ -53,9 +53,18 @@ const handleNewUser = async (req, res) => {
       register_otp: otp,
     });
 
+    const roles1 = Object.values(user.roles).filter(Boolean);
+
+    //user arragements
+    user.roles = roles1;
+    user.refreshToken = "***Deleted for security reasons!***";
+    user.register_otp = "***Deleted for security reasons!***";
+    user.login_otp = "***Deleted for security reasons!***";
+
     res.status(200).json({
       status: 200,
       message: `Kullanıcı oluşturuldu!`,
+      user: user,
     });
   } catch (err) {
     res.status(500).json({ status: 500, message: err.message });
