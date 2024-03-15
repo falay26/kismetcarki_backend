@@ -44,7 +44,7 @@ const getUser = async (req, res) => {
 
     res.status(200).json({
       status: 200,
-      message: "Kullanıcı başarıyla güncellendi!",
+      message: "Kullanıcı başarıyla bulundu!",
       user: user,
     });
   } catch (err) {
@@ -158,7 +158,7 @@ const updateProfile = async (req, res) => {
         _id: suitted_id,
       }).exec();
       suitted_user.my_suitors = suitted_user.my_suitors.concat([
-        { id: user_id, date: date },
+        { id: user_id, date: date, seen: false },
       ]);
       await suitted_user.save();
 
@@ -398,15 +398,53 @@ const findFortune = async (req, res) => {
       });
 
     let used_gender =
-      preferred_gender_id.length === 0 || preferred_gender_id.length === 2
+      preferred_gender_id?.length === 0 || preferred_gender_id?.length === 2
         ? ["0", "1", "2"]
         : preferred_gender_id;
-
-    //TODO: other filters
+    let used_school =
+      filters?.education?.length === 0 || filters?.education?.length === 7
+        ? [1, 2, 3, 4, 5, 6, 7]
+        : filters?.education.map((i) => Number(i));
+    let used_work =
+      filters?.work?.length === 0 || filters?.work?.length === 7
+        ? [1, 2, 3, 4, 5, 6, 7]
+        : filters?.work?.map((i) => Number(i));
+    let used_marital =
+      filters?.marital?.length === 0 || filters?.marital?.length === 2
+        ? [1, 2]
+        : filters?.marital?.map((i) => Number(i));
+    let used_children =
+      filters?.children?.length === 0 || filters?.children?.length === 2
+        ? [1, 2]
+        : filters?.children?.map((i) => Number(i));
+    let used_health =
+      filters?.health?.length === 0 || filters?.health?.length === 2
+        ? [1, 2]
+        : filters?.health?.map((i) => Number(i));
+    let used_hair =
+      filters?.hair?.length === 0 || filters?.hair?.length === 3
+        ? [1, 2, 3]
+        : filters?.hair?.map((i) => Number(i));
+    let used_skin =
+      filters?.skin?.length === 0 || filters?.skin?.length === 3
+        ? [1, 2, 3]
+        : filters?.skin?.map((i) => Number(i));
+    let used_religion =
+      filters?.faith?.length === 0 || filters?.faith?.length === 3
+        ? [1, 2, 3, 4, 5, 6, 7]
+        : filters?.faith?.map((i) => Number(i));
 
     const users = await User.find({
       _id: { $ne: user_id },
       gender_id: { $in: used_gender },
+      school: { $in: used_school },
+      work: { $in: used_work },
+      marital: { $in: used_marital },
+      children: { $in: used_children },
+      health: { $in: used_health },
+      hair: { $in: used_hair },
+      skin: { $in: used_skin },
+      religion: { $in: used_religion },
       verified: true,
     }).exec();
 
@@ -422,8 +460,9 @@ const findFortune = async (req, res) => {
       let finals = users
         .filter((i) => !mainUser.blockeds.includes(i._id)) //Engelliler.
         .filter((j) => !seen_list.includes(j.id)); //28 gün içinde görülenler.
-      if (filters.children.length !== 0 || filters.children.length !== 2) {
-        finals.filter((i) => filters.children.includes(i.children));
+      if (filters.hobies.length !== 0 || filters.hobies.length !== 14) {
+        //Hobiler
+        finals = finals.filter((i) => filters.hobies.includes(i.children));
       } //Çocuk filtresi
       if (filters.education.length !== 0 || filters.education.length !== 7) {
         finals.filter((i) => filters.education.includes(i.school));
