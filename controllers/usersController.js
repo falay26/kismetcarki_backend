@@ -460,13 +460,6 @@ const findFortune = async (req, res) => {
       let finals = users
         .filter((i) => !mainUser.blockeds.includes(i._id)) //Engelliler.
         .filter((j) => !seen_list.includes(j.id)); //28 gün içinde görülenler.
-      if (filters.hobies.length !== 0 || filters.hobies.length !== 14) {
-        //Hobiler
-        finals = finals.filter((i) => filters.hobies.includes(i.children));
-      } //Çocuk filtresi
-      if (filters.education.length !== 0 || filters.education.length !== 7) {
-        finals.filter((i) => filters.education.includes(i.school));
-      } //Eğitim filtresi
 
       if (finals.length !== 0) {
         let date = new Date();
