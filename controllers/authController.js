@@ -179,6 +179,7 @@ const confirmLoginOtp = async (req, res) => {
 
       //user arragements
       foundUser.roles = roles;
+      foundUser.accessToken = accessToken;
       foundUser.refreshToken = "***Deleted for security reasons!***";
       foundUser.register_otp = "***Deleted for security reasons!***";
       foundUser.login_otp = "***Deleted for security reasons!***";
