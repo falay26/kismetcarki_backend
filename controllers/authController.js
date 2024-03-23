@@ -179,14 +179,15 @@ const confirmLoginOtp = async (req, res) => {
 
       //user arragements
       foundUser.roles = roles;
-      foundUser.refreshToken = "***Deleted for security reasons!***";
+      foundUser.accessToken = accessToken;
+      //foundUser.refreshToken = "***Deleted for security reasons!***";
       foundUser.register_otp = "***Deleted for security reasons!***";
       foundUser.login_otp = "***Deleted for security reasons!***";
 
       res.status(200).json({
         status: 200,
         message: "Giriş yapma işlemi başarılı!",
-        user: { ...foundUser, accessToken },
+        user: foundUser,
       });
     } else {
       res.status(200).json({
