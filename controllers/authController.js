@@ -177,17 +177,64 @@ const confirmLoginOtp = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      //user arragements
-      foundUser.roles = roles;
-      foundUser.accessToken = accessToken;
-      //foundUser.refreshToken = "***Deleted for security reasons!***";
-      foundUser.register_otp = "***Deleted for security reasons!***";
-      foundUser.login_otp = "***Deleted for security reasons!***";
-
       res.status(200).json({
         status: 200,
         message: "Giriş yapma işlemi başarılı!",
-        user: foundUser,
+        user: {
+          roles,
+          accessToken,
+          refreshToken: foundUser.refreshToken,
+          phone_code: foundUser.phone_code,
+          phone: foundUser.phone,
+          name: foundUser.name,
+          birth_date: foundUser.birth_date,
+          gender_id: foundUser.gender_id,
+          preferred_gender_id: foundUser.preferred_gender_id,
+          city_id: foundUser.city_id,
+          notification_token: foundUser.notification_token,
+          profile_picture: foundUser.profile_picture,
+          register_otp: foundUser.register_otp,
+          login_otp: foundUser.login_otp,
+          verified: foundUser.verified,
+          hobies: foundUser.hobies,
+          about_me: foundUser.about_me,
+          fav_movie: foundUser.fav_movie,
+          fav_book: foundUser.fav_book,
+          fav_meal: foundUser.fav_meal,
+          language_code: foundUser.language_code,
+          frozen: foundUser.frozen,
+          blockeds: foundUser.blockeds,
+          suitors: foundUser.suitors,
+          user_type_id: foundUser.user_type_id,
+          add_package: foundUser.add_package,
+          packages: foundUser.packages,
+          themes: foundUser.themes,
+          selected_theme: foundUser.selected_theme,
+          my_suitors: foundUser.my_suitors,
+          already_seen: foundUser.already_seen,
+          matches: foundUser.matches,
+          fav_matches: foundUser.fav_matches,
+          last_seen: foundUser.last_seen,
+          allow_notifications: foundUser.allow_notifications,
+          story_requests: foundUser.story_requests,
+          allow_story: foundUser.allow_story,
+          in_story_with: foundUser.in_story_with,
+          school: foundUser.school,
+          work: foundUser.work,
+          marital: foundUser.marital,
+          children: foundUser.children,
+          health: foundUser.health,
+          hair: foundUser.hair,
+          skin: foundUser.skin,
+          height: foundUser.height,
+          weight: foundUser.weight,
+          religion: foundUser.religion,
+          fltr_hobies: foundUser.fltr_hobies,
+          fltr_fobies: foundUser.fltr_fobies,
+          values: foundUser.values,
+          created_at: foundUser.created_at,
+          updated_at: foundUser.updated_at,
+        },
       });
     } else {
       res.status(200).json({
