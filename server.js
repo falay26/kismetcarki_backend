@@ -63,6 +63,10 @@ app.use("/read_notifications", require("./routes/read_notifications"));
 app.use("/get_posts", require("./routes/post/get_posts"));
 app.use("/add_post", require("./routes/post/add_post"));
 
+//For Admin
+//Users
+app.use("/get_all_users", require("./routes/admin/get_all_users"));
+
 /*
 app.use("/refresh", require("./routes/refresh"));
 app.use("/logout", require("./routes/logout"));
