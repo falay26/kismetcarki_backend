@@ -8,9 +8,17 @@ var serverKey = process.env.FIREBASE_SERVER_KEY;
 var fcm = new FCM(serverKey);
 
 const getAllUsers = async (req, res) => {
-  const users = await User.find();
-  if (!users) return res.status(204).json({ message: "No users found" });
-  res.json(users);
+  try {
+    const users = await User.find({ verified: true });
+
+    res.status(200).json({
+      status: 200,
+      data: users,
+      message: `Bütün kullanıcılar başarı ile döndürüldü!`,
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
 };
 
 const deleteUser = async (req, res) => {
