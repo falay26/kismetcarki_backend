@@ -68,6 +68,15 @@ app.use("/add_support", require("./routes/add_support"));
 //For Admin
 //Users
 app.use("/get_all_users", require("./routes/admin/get_all_users"));
+//Notifications
+app.use(
+  "/get_all_notifications",
+  require("./routes/admin/notifications/get_all_notifications")
+);
+app.use(
+  "/send_notifications",
+  require("./routes/admin/notifications/send_notifications")
+);
 
 /*
 app.use("/refresh", require("./routes/refresh"));

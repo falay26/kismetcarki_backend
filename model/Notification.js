@@ -10,6 +10,12 @@ const notificationSchema = new Schema(
     type: {
       type: Number,
     },
+    title: {
+      type: Object,
+    },
+    message: {
+      type: Object,
+    },
     related_id: {
       type: ObjectId,
     },
