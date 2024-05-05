@@ -6,10 +6,10 @@ const getAllSupports = async (req, res) => {
       { $match: { _id: { $exists: true } } },
       {
         $lookup: {
-          from: "branches",
-          localField: "branch_id",
+          from: "users",
+          localField: "user_id",
           foreignField: "_id",
-          as: "branch_info",
+          as: "user_info",
         },
       },
     ]);

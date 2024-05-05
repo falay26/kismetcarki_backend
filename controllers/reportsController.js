@@ -23,29 +23,22 @@ const reportUser = async (req, res) => {
 };
 
 const getAllReports = async (req, res) => {
-  const { user_id, report_type } = req.body;
-
   const reports = await Report.aggregate([
-    {
-      $match: {
-        reporter: mongoose.Types.ObjectId(user_id),
-        report_type: report_type,
-      },
-    },
-    {
-      $lookup: {
-        from: "firms",
-        localField: "reported",
-        foreignField: "owner_id",
-        as: "firm_info",
-      },
-    },
+    { $match: { _id: { $exists: true } } },
     {
       $lookup: {
         from: "users",
         localField: "reported",
         foreignField: "_id",
-        as: "user_info",
+        as: "reported_user",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "reporter",
+        foreignField: "_id",
+        as: "reporter_user",
       },
     },
   ]);

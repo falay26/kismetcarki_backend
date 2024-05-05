@@ -77,6 +77,11 @@ app.use(
   "/send_notifications",
   require("./routes/admin/notifications/send_notifications")
 );
+//Supports
+app.use("/get_all_supports", require("./routes/admin/get_all_supports"));
+app.use("/get_all_reports", require("./routes/admin/get_all_reports"));
+//
+//get_all_reports
 
 /*
 app.use("/refresh", require("./routes/refresh"));
