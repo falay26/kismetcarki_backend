@@ -74,8 +74,24 @@ const sendChatMessage = async (req, res) => {
   }
 };
 
+const deleteChat = async (req, res) => {
+  const { chat_id } = req.body;
+
+  try {
+    await Chat.deleteOne({ _id: chat_id }).exec();
+
+    res.status(200).json({
+      status: 200,
+      message: "Sohbet odası başarıyla silindi!",
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
 module.exports = {
   startChat,
   getAllChats,
   sendChatMessage,
+  deleteChat,
 };

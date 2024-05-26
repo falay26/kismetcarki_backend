@@ -79,9 +79,10 @@ app.use(
 );
 //Supports
 app.use("/get_all_supports", require("./routes/admin/get_all_supports"));
+//Reports
 app.use("/get_all_reports", require("./routes/admin/get_all_reports"));
-//
-//get_all_reports
+//Chats
+app.use("/delete_chat", require("./routes/admin/delete_chat"));
 
 /*
 app.use("/refresh", require("./routes/refresh"));
