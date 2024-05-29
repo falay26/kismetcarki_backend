@@ -32,7 +32,13 @@ const getAllChats = async (req, res) => {
         _id: user_id,
       }).exec();
       const chats = await Chat.aggregate([
-        { $match: { _id: { $nin: user.blocked_chats } } },
+        {
+          $match: {
+            _id: {
+              $nin: user.blocked_chats.map((i) => mongoose.Types.ObjectId(i)),
+            },
+          },
+        },
         {
           $lookup: {
             from: "users",
