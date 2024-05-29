@@ -1,4 +1,5 @@
 const Chat = require("../model/Chat");
+const User = require("../model/User");
 const mongoose = require("mongoose");
 
 const startChat = async (req, res) => {
@@ -23,23 +24,50 @@ const startChat = async (req, res) => {
 };
 
 const getAllChats = async (req, res) => {
-  try {
-    const chats = await Chat.aggregate([
-      {
-        $lookup: {
-          from: "users",
-          localField: "participants._id",
-          foreignField: "_id",
-          as: "users_info",
-        },
-      },
-    ]);
+  const { user_id } = req.body;
 
-    res.status(200).json({
-      status: 200,
-      data: chats,
-      message: "Sohbet odaları başarıyla döndürüldü!",
-    });
+  try {
+    if (user_id) {
+      const user = await User.findOne({
+        _id: user_id,
+      }).exec();
+      const chats = await Chat.aggregate([
+        {
+          $match: { _id: { $nin: user.blocked_chats } },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "participants._id",
+            foreignField: "_id",
+            as: "users_info",
+          },
+        },
+      ]);
+
+      res.status(200).json({
+        status: 200,
+        data: chats,
+        message: "Sohbet odaları başarıyla döndürüldü!",
+      });
+    } else {
+      const chats = await Chat.aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "participants._id",
+            foreignField: "_id",
+            as: "users_info",
+          },
+        },
+      ]);
+
+      res.status(200).json({
+        status: 200,
+        data: chats,
+        message: "Sohbet odaları başarıyla döndürüldü!",
+      });
+    }
   } catch (err) {
     res.status(500).json({ status: 500, message: err.message });
   }

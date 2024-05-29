@@ -99,6 +99,7 @@ const updateProfile = async (req, res) => {
     language_code,
     frozen,
     blockeds,
+    blocked_chats,
     suitors,
     user_type_id,
     add_package,
@@ -158,6 +159,7 @@ const updateProfile = async (req, res) => {
     if (language_code !== undefined) user.language_code = language_code;
     if (frozen !== undefined) user.frozen = frozen;
     if (blockeds !== undefined) user.blockeds = blockeds;
+    if (blocked_chats !== undefined) user.blocked_chats = blocked_chats;
     if (suitors !== undefined) {
       let date = new Date();
       user.suitors = suitors;

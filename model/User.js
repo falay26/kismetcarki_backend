@@ -86,6 +86,10 @@ const userSchema = new Schema(
       type: Array,
       default: [],
     },
+    blocked_chats: {
+      type: Array,
+      default: [],
+    },
     suitors: {
       type: Array,
       default: [],
