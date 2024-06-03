@@ -36,7 +36,7 @@ const getAllReports = async (req, res) => {
     {
       $lookup: {
         from: "chats",
-        localField: "reported",
+        localField: "reported_id",
         foreignField: "_id",
         as: "reported_chat",
       },

@@ -12,6 +12,10 @@ const reportSchema = new Schema(
       type: ObjectId,
       required: true,
     },
+    reported_id: {
+      type: ObjectId,
+      required: true,
+    },
     report_type: {
       type: String,
     },
