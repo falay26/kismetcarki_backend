@@ -2,12 +2,14 @@ const Report = require("../model/Report");
 var mongoose = require("mongoose");
 
 const reportUser = async (req, res) => {
-  const { user_id, suggestion, reported_user, report_type } = req.body;
+  const { user_id, suggestion, reported_user, reported_chat, report_type } =
+    req.body;
 
   try {
     const result = await Report.create({
       reporter: user_id,
       reported: reported_user,
+      reported_id: reported_chat,
       report: suggestion,
       report_type: report_type,
     });
