@@ -10,11 +10,9 @@ const reportSchema = new Schema(
     },
     reported: {
       type: ObjectId,
-      required: true,
     },
     reported_id: {
       type: ObjectId,
-      required: true,
     },
     report_type: {
       type: String,
