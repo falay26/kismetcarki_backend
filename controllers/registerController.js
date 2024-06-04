@@ -57,7 +57,7 @@ const handleNewUser = async (req, res) => {
 
     //user arragements
     user.roles = roles1;
-    user.suspended = Date.now < user.suspended_until;
+    user.suspended = new Date() < new Date(user.suspended_until);
     user.refreshToken = "***Deleted for security reasons!***";
     user.register_otp = "***Deleted for security reasons!***";
     user.login_otp = "***Deleted for security reasons!***";
@@ -91,7 +91,7 @@ const confirmRegisterOtp = async (req, res) => {
         status: 200,
         user: {
           roles,
-          suspended: Date.now < foundUser.suspended_until,
+          suspended: new Date() < new Date(foundUser.suspended_until),
           name: user.name,
           phone_code: user.phone_code,
           phone: user.phone,

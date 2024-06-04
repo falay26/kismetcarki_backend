@@ -46,7 +46,7 @@ const getUser = async (req, res) => {
 
     //user arragements
     user.roles = roles;
-    user.suspended = Date.now < user.suspended_until;
+    user.suspended = new Date() < new Date(user.suspended_until);
     user.refreshToken = "***Deleted for security reasons!***";
     user.register_otp = "***Deleted for security reasons!***";
     user.login_otp = "***Deleted for security reasons!***";
@@ -380,7 +380,7 @@ const updateProfile = async (req, res) => {
 
     //user arragements
     user.roles = roles;
-    user.suspended = Date.now < user.suspended_until;
+    user.suspended = new Date() < new Date(user.suspended_until);
     user.refreshToken = "***Deleted for security reasons!***";
     user.register_otp = "***Deleted for security reasons!***";
     user.login_otp = "***Deleted for security reasons!***";
@@ -489,7 +489,7 @@ const findFortune = async (req, res) => {
 
         //user arragements
         mainUser.roles = roles1;
-        mainUser.suspended = Date.now < mainUser.suspended_until;
+        mainUser.suspended = new Date() < new Date(mainUser.suspended_until);
         mainUser.refreshToken = "***Deleted for security reasons!***";
         mainUser.register_otp = "***Deleted for security reasons!***";
         mainUser.login_otp = "***Deleted for security reasons!***";

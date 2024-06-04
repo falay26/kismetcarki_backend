@@ -79,7 +79,7 @@ const handleLogin = async (req, res) => {
 
       //user arragements
       foundUser.roles = roles;
-      foundUser.suspended = Date.now < foundUser.suspended_until;
+      foundUser.suspended = new Date() < new Date(foundUser.suspended_until);
       foundUser.refreshToken = "***Deleted for security reasons!***";
       foundUser.register_otp = "***Deleted for security reasons!***";
       foundUser.login_otp = "***Deleted for security reasons!***";
@@ -187,7 +187,7 @@ const confirmLoginOtp = async (req, res) => {
         user: {
           roles,
           accessToken,
-          suspended: Date.now < foundUser.suspended_until,
+          suspended: new Date() < new Date(foundUser.suspended_until),
           refreshToken: foundUser.refreshToken,
           phone_code: foundUser.phone_code,
           phone: foundUser.phone,
