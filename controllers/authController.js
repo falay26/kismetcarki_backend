@@ -83,6 +83,7 @@ const handleLogin = async (req, res) => {
       foundUser.refreshToken = "***Deleted for security reasons!***";
       foundUser.register_otp = "***Deleted for security reasons!***";
       foundUser.login_otp = "***Deleted for security reasons!***";
+      foundUser.deneme = "Deneme";
 
       res.status(200).json({
         status: 200,

@@ -153,6 +153,10 @@ const userSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    suspended: {
+      type: Boolean,
+      default: false,
+    },
     //Filters
     school: {
       type: Number,

@@ -533,7 +533,8 @@ const suspendUser = async (req, res) => {
       _id: user_id,
     }).exec();
 
-    user.suspended_until = Date.now + month * 24 * 60 * 1000;
+    user.suspended_until =
+      Date.now.getTime() + month * 30 * 24 * 60 * 60 * 1000;
     await user.save();
 
     res.status(200).json({
