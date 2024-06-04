@@ -68,6 +68,7 @@ app.use("/add_support", require("./routes/add_support"));
 //For Admin
 //Users
 app.use("/get_all_users", require("./routes/admin/get_all_users"));
+app.use("/suspend_user", require("./routes/admin/suspend_user"));
 //Notifications
 app.use(
   "/get_all_notifications",

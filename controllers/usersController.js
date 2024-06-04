@@ -46,6 +46,7 @@ const getUser = async (req, res) => {
 
     //user arragements
     user.roles = roles;
+    user.suspended = Date.now < user.suspended_until;
     user.refreshToken = "***Deleted for security reasons!***";
     user.register_otp = "***Deleted for security reasons!***";
     user.login_otp = "***Deleted for security reasons!***";
@@ -379,6 +380,7 @@ const updateProfile = async (req, res) => {
 
     //user arragements
     user.roles = roles;
+    user.suspended = Date.now < user.suspended_until;
     user.refreshToken = "***Deleted for security reasons!***";
     user.register_otp = "***Deleted for security reasons!***";
     user.login_otp = "***Deleted for security reasons!***";
@@ -487,6 +489,7 @@ const findFortune = async (req, res) => {
 
         //user arragements
         mainUser.roles = roles1;
+        mainUser.suspended = Date.now < mainUser.suspended_until;
         mainUser.refreshToken = "***Deleted for security reasons!***";
         mainUser.register_otp = "***Deleted for security reasons!***";
         mainUser.login_otp = "***Deleted for security reasons!***";
@@ -522,6 +525,26 @@ const findFortune = async (req, res) => {
   }
 };
 
+const suspendUser = async (req, res) => {
+  const { user_id, month } = req.body;
+
+  try {
+    const user = await User.findOne({
+      _id: user_id,
+    }).exec();
+
+    user.suspended_until = Date.now + month * 24 * 60 * 1000;
+    await user.save();
+
+    res.status(200).json({
+      status: 200,
+      message: "Kullanıcı başarıyla askıya alındı!",
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   deleteUser,
@@ -529,4 +552,5 @@ module.exports = {
   getUsers,
   updateProfile,
   findFortune,
+  suspendUser,
 };

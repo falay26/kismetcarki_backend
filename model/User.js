@@ -149,6 +149,10 @@ const userSchema = new Schema(
       type: ObjectId,
       default: null,
     },
+    suspended_until: {
+      type: Date,
+      default: Date.now,
+    },
     //Filters
     school: {
       type: Number,
