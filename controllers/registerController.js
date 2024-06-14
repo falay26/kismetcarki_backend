@@ -91,7 +91,7 @@ const confirmRegisterOtp = async (req, res) => {
         status: 200,
         user: {
           roles,
-          suspended: new Date() < new Date(foundUser.suspended_until),
+          suspended: new Date() < new Date(user.suspended_until),
           name: user.name,
           phone_code: user.phone_code,
           phone: user.phone,
