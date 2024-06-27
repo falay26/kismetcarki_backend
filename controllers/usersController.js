@@ -414,6 +414,12 @@ const findFortune = async (req, res) => {
         message: "Kullanıcı bulunamadı.",
       });
 
+    let non_includers = mainUser.blockeds
+      .concat(mainUser.suitors.map((i) => i.id))
+      .concat(mainUser.my_suitors.map((i) => i.id))
+      .concat(mainUser.matches)
+      .map((i) => mongoose.Types.ObjectId(i));
+
     let used_gender =
       preferred_gender_id?.length === 0 || preferred_gender_id?.length === 2
         ? ["0", "1", "2"]
@@ -452,7 +458,7 @@ const findFortune = async (req, res) => {
         : filters?.faith?.map((i) => Number(i));
 
     const users = await User.find({
-      _id: { $ne: user_id },
+      _id: { $ne: user_id, $nin: non_includers },
       gender_id: { $in: used_gender },
       school: { $in: used_school },
       work: { $in: used_work },

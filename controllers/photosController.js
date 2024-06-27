@@ -23,7 +23,7 @@ const getAllPhotos = async (req, res) => {
   const { user_id } = req.body;
 
   try {
-    const photos = await Photo.find({ owner_id: user_id });
+    const photos = await Photo.find({ owner_id: user_id }).sort({ date: -1 });
 
     res.status(200).json({
       status: 200,
