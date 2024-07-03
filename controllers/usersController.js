@@ -171,6 +171,7 @@ const updateProfile = async (req, res) => {
       suitted_user.my_suitors = suitted_user.my_suitors.concat([
         { id: user_id, date: date, seen: false },
       ]);
+      await suitted_user.markModified("my_suitors");
       await suitted_user.save();
 
       var message = {
