@@ -168,32 +168,36 @@ const updateProfile = async (req, res) => {
       const suitted_user = await User.findOne({
         _id: suitted_id,
       }).exec();
-      suitted_user.my_suitors = suitted_user.my_suitors.concat([
-        { id: user_id, date: date, seen: false },
-      ]);
-      await suitted_user.markModified("my_suitors");
-      await suitted_user.save();
+      if (
+        suitted_user.my_suitors.filter((i) => i.id === user_id).length === 0
+      ) {
+        suitted_user.my_suitors = suitted_user.my_suitors.concat([
+          { id: user_id, date: date, seen: false },
+        ]);
+        await suitted_user.markModified("my_suitors");
+        await suitted_user.save();
 
-      var message = {
-        to: suitted_user.notification_token,
-        notification: {
-          title: "Kısmet Çarkı",
-          body: user.name + " sana talip oldu.👩‍❤️‍👨💟",
-        },
-      };
+        var message = {
+          to: suitted_user.notification_token,
+          notification: {
+            title: "Kısmet Çarkı",
+            body: user.name + " sana talip oldu.👩‍❤️‍👨💟",
+          },
+        };
 
-      await Notification.create({
-        owner_id: suitted_user._id,
-        type: 0,
-        related_id: user._id,
-        readed: false,
-      });
+        await Notification.create({
+          owner_id: suitted_user._id,
+          type: 0,
+          related_id: user._id,
+          readed: false,
+        });
 
-      fcm.send(message, function (err, response) {
-        if (err) {
-        } else {
-        }
-      });
+        fcm.send(message, function (err, response) {
+          if (err) {
+          } else {
+          }
+        });
+      }
     }
     if (user_type_id !== undefined) {
       user.user_type_id = user_type_id;
