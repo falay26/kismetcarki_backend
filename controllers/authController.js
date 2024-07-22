@@ -188,6 +188,7 @@ const confirmLoginOtp = async (req, res) => {
         user: {
           roles,
           accessToken,
+          _id: foundUser._id,
           suspended: new Date() < new Date(foundUser.suspended_until),
           refreshToken: foundUser.refreshToken,
           phone_code: foundUser.phone_code,
