@@ -81,6 +81,7 @@ const confirmRegisterOtp = async (req, res) => {
         phone_code: phone_code,
         phone: phone,
       },
+      null,
       { sort: { created_at: -1 } }
     ).exec();
 
@@ -126,6 +127,7 @@ const resendRegisterOtp = async (req, res) => {
         phone_code: phone_code,
         phone: phone,
       },
+      null,
       { sort: { created_at: -1 } }
     ).exec();
 
