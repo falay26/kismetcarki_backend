@@ -80,7 +80,7 @@ const confirmRegisterOtp = async (req, res) => {
       phone_code: phone_code,
       phone: phone,
     })
-      .sort({ $natural: -1 })
+      .sort({ created_at: -1 })
       .limit(1)
       .exec();
 
@@ -124,7 +124,10 @@ const resendRegisterOtp = async (req, res) => {
     const user = await User.findOne({
       phone_code: phone_code,
       phone: phone,
-    }).exec();
+    })
+      .sort({ created_at: -1 })
+      .limit(1)
+      .exec();
 
     let otp = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
     client.messages
