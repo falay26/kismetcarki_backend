@@ -65,6 +65,9 @@ app.use("/add_post", require("./routes/post/add_post"));
 app.use("/report_user", require("./routes/report/user"));
 app.use("/add_support", require("./routes/add_support"));
 
+//For creating users
+app.use("/register_users", require("./routes/auth/register_users"));
+
 //For Admin
 //Users
 app.use("/get_all_users", require("./routes/admin/get_all_users"));

@@ -76,10 +76,13 @@ const confirmRegisterOtp = async (req, res) => {
   const { phone_code, phone, otp } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user = await User.find({
       phone_code: phone_code,
       phone: phone,
-    }).exec();
+    })
+      .sort({ $natural: -1 })
+      .limit(1)
+      .exec();
 
     if (user.register_otp === otp) {
       user.verified = true;
@@ -145,4 +148,129 @@ const resendRegisterOtp = async (req, res) => {
   }
 };
 
-module.exports = { handleNewUser, confirmRegisterOtp, resendRegisterOtp };
+const createNewUsers = async (req, res) => {
+  const {} = req.body;
+
+  try {
+    console.log("GİRDİ!");
+    let array = new Array(50);
+    let male_names = [
+      "Mehmet",
+      "Mustafa",
+      "Ahmet",
+      "Ali",
+      "Hüseyin",
+      "Hasan",
+      "Murat",
+      "Yusuf",
+      "İbrahim",
+      "İsmail",
+      "Ömer",
+      "Ramazan",
+      "Osman",
+      "Abdullah",
+      "Fatih",
+      "Emre",
+      "Halil",
+      "Süleyman",
+      "Hakan",
+      "Adem",
+      "Muhammed",
+      "Kadir",
+      "Furkan",
+      "Mahmut",
+      "Burak",
+    ];
+    let female_names = [
+      "Fatma",
+      "Ayşe",
+      "Emine",
+      "Hatice",
+      "Zeynep",
+      "Elif",
+      "Meryem",
+      "Merve",
+      "Zehra",
+      "Esra",
+      "Özlem",
+      "Büşra",
+      "Yasemin",
+      "Hülya",
+      "Melek",
+      "Sultan",
+      "Kübra",
+      "Dilek",
+      "Rabia",
+      "Leyla",
+      "Songül",
+      "Aysel",
+      "Sevim",
+      "Hacer",
+      "Tuğba",
+    ];
+    let cities = ["34", "06", "35", "16", "07"];
+    let last_names = [
+      "A.",
+      "E.",
+      "C.",
+      "B.",
+      "N.",
+      "M.",
+      "P.",
+      "S.",
+      "R.",
+      "Y.",
+      "T.",
+      "K.",
+      "Ö.",
+      "F.",
+    ];
+    [...array].map(async (i, index) => {
+      let last_2_digits = index.toString().length === 1 ? "0" + index : index;
+      let phone = "50000000" + last_2_digits;
+      let gender_id = index < 25 ? "2" : "1";
+      let gender_index = index < 25 ? index : index % 25;
+      let birth_date = "1995-07-22T11:52:10.000Z";
+      let name =
+        (gender_id === "2"
+          ? male_names[gender_index]
+          : female_names[gender_index]) +
+        " " +
+        last_names[Math.floor(Math.random() * last_names.length)];
+      let city_id = cities[Math.floor(Math.random() * cities.length)];
+      let verified = true;
+      await User.create({
+        phone: phone,
+        name: name,
+        birth_date: birth_date,
+        gender_id: gender_id,
+        city_id: city_id,
+        profile_picture: "",
+      });
+    });
+    /*
+    await User.create({
+      phone: phone,
+      name: name,
+      birth_date: birth_date,
+      gender_id: gender_id,
+      city_id: city_id,
+      profile_picture: '',
+    });
+    */
+
+    res.status(200).json({
+      status: 200,
+      message: `Kullanıcı oluşturuldu!`,
+    });
+  } catch (err) {
+    res.status(500).json({ status: 500, message: err.message });
+  }
+};
+
+module.exports = {
+  handleNewUser,
+  confirmRegisterOtp,
+  resendRegisterOtp,
+  createNewUsers,
+};
