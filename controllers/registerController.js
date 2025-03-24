@@ -76,13 +76,13 @@ const confirmRegisterOtp = async (req, res) => {
   const { phone_code, phone, otp } = req.body;
 
   try {
-    const user = await User.find({
-      phone_code: phone_code,
-      phone: phone,
-    })
-      .sort({ created_at: -1 })
-      .limit(1)
-      .exec();
+    const user = await User.findOne(
+      {
+        phone_code: phone_code,
+        phone: phone,
+      },
+      { sort: { created_at: -1 } }
+    ).exec();
 
     if (user.register_otp === otp) {
       user.verified = true;
@@ -121,13 +121,13 @@ const resendRegisterOtp = async (req, res) => {
   const { phone_code, phone } = req.body;
 
   try {
-    const user = await User.find({
-      phone_code: phone_code,
-      phone: phone,
-    })
-      .sort({ created_at: -1 })
-      .limit(1)
-      .exec();
+    const user = await User.findOne(
+      {
+        phone_code: phone_code,
+        phone: phone,
+      },
+      { sort: { created_at: -1 } }
+    ).exec();
 
     let otp = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
     client.messages
