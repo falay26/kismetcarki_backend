@@ -121,7 +121,7 @@ const resendRegisterOtp = async (req, res) => {
   const { phone_code, phone } = req.body;
 
   try {
-    const user = await User.findOne({
+    const user = await User.find({
       phone_code: phone_code,
       phone: phone,
     })
